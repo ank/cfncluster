@@ -14,6 +14,7 @@ __author__ = 'dougalb'
 import boto.ec2
 import boto.vpc
 import urllib2
+from urlparse import urlparse
 import boto.exception
 import sys
 
@@ -47,6 +48,15 @@ def check_resource(region, aws_access_key_id, aws_secret_access_key, resource_ty
         except boto.exception.BotoServerError as e:
             print('Config sanity error: %s' % e.message)
             sys.exit(1)
+    # VPC Security Group
+    elif resource_type == 'VPCSecurityGroup':
+        try:
+            vpc_conn = boto.vpc.connect_to_region(region,aws_access_key_id=aws_access_key_id,
+                                                 aws_secret_access_key=aws_secret_access_key)
+            test = vpc_conn.get_all_security_groups(group_ids=resource_value)
+        except boto.exception.BotoServerError as e:
+            print('Config sanity error: %s' % e.message)
+            sys.exit(1)
     # EC2 AMI Id
     elif resource_type == 'EC2Ami':
         try:
@@ -67,14 +77,18 @@ def check_resource(region, aws_access_key_id, aws_secret_access_key, resource_ty
             sys.exit(1)
     # URL
     elif resource_type == 'URL':
-        try:
-            urllib2.urlopen(resource_value)
-        except urllib2.HTTPError, e:
-            print(e.code)
-            sys.exit(1)
-        except urllib2.URLError, e:
-            print(e.args)
-            sys.exit(1)
+        scheme = urlparse(resource_value).scheme
+        if scheme == 's3':
+            pass
+        else:
+            try:
+                urllib2.urlopen(resource_value)
+            except urllib2.HTTPError, e:
+                print(e.code)
+                sys.exit(1)
+            except urllib2.URLError, e:
+                print(e.args)
+                sys.exit(1)
     # EC2 EBS Snapshot Id
     elif resource_type == 'EC2Snapshot':
         try:

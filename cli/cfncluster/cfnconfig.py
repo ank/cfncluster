@@ -160,7 +160,7 @@ class CfnClusterConfig:
                                   compute_subnet_cidr=('ComputeSubnetCidr',None),
                                   compute_subnet_id=('ComputeSubnetId', 'VPCSubnet'), use_public_ips=('UsePublicIps',
                                                                                                       None),
-                                  ssh_from=('SSHFrom', None))
+                                  ssh_from=('SSHFrom', None), additional_sg=('AdditionalSG','VPCSecurityGroup'))
 
         # Loop over all VPC options and add define to parameters, raise Exception is defined but null
         for key in self.__vpc_options:
@@ -187,7 +187,9 @@ class CfnClusterConfig:
                                       placement=('Placement',None), placement_group=('PlacementGroup','EC2PlacementGroup'),
                                       encrypted_ephemeral=('EncryptedEphemeral',None),pre_install_args=('PreInstallArgs',None),
                                       post_install_args=('PostInstallArgs',None), s3_read_resource=('S3ReadResource',None),
-                                      s3_read_write_resource=('S3ReadWriteResource',None))
+                                      s3_read_write_resource=('S3ReadWriteResource',None),cwl_region=('CWLRegion',None),
+                                      cwl_log_group=('CWLLogGroup',None),shared_dir=('SharedDir',None)
+                                      )
 
         # Loop over all the cluster options and add define to parameters, raise Exception if defined but null
         for key in self.__cluster_options:

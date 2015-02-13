@@ -15,21 +15,21 @@ function error_exit () {
   exit 1
 }
 
-# Basic DNS check, using dnsdomain and checking for NS record
-function check_dns_ns () {
+# Basic DNS check, using A record for cloudformation endpoint
+function check_dns_basic () {
   TRY=0
-  domain=$(dnsdomainname)
+  domain="cloudformation.${cfn_region}.amazonaws.com"
   while [ $TRY -lt 3 ]; do
-    host -t ns $domain >/dev/null
-    check_ns=$?
-    if [ $check_ns -eq 0 ]; then
+    host $domain >/dev/null
+    check_dns=$?
+    if [ $check_dns -eq 0 ]; then
       break
     else
       sleep 10
       TRY=$(( $TRY + 1 ))
     fi
   done
-  return $check_ns
+  return $check_dns
 }
 
 # Check DNS is working, as it is required for correct operation
@@ -52,8 +52,13 @@ function check_dns_fqdn () {
 function run_preinstall () {
   RC=0
   if [ "${cfn_preinstall}" != "NONE" ]; then
+    scheme=$(echo "${cfn_preinstall}"| cut -d: -f1)
     tmpfile=$(mktemp)
-    wget -qO- ${cfn_preinstall} > $tmpfile || RC=1
+    if [ "${scheme}" == "s3" ]; then
+      aws --region ${cfn_region} s3 cp ${cfn_preinstall} - > $tmpfile || RC=1
+    else
+      wget -qO- ${cfn_preinstall} > $tmpfile || RC=1
+    fi
     if [ "${cfn_preinstall_args}" != "NONE" ]; then
       args=${cfn_preinstall_args}
     fi
@@ -128,8 +133,13 @@ function setup_ephemeral_drives () {
 function run_postinstall () {
   RC=0
   if [ "${cfn_postinstall}" != "NONE" ]; then
+    scheme=$(echo "${cfn_postinstall}"| cut -d: -f1)
     tmpfile=$(mktemp)
-    wget -qO- ${cfn_postinstall} > $tmpfile || RC=1
+    if [ "${scheme}" == "s3" ]; then
+      aws --region ${cfn_region} s3 cp ${cfn_postinstall} - > $tmpfile || RC=1
+    else
+      wget -qO- ${cfn_postinstall} > $tmpfile || RC=1
+    fi
     if [ "${cfn_postinstall_args}" != "NONE" ]; then
       args=${cfn_postinstall_args}
     fi
