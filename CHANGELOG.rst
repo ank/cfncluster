@@ -2,6 +2,28 @@
 CHANGELOG
 =========
 
+develop
+=======
+* feature:``cfncluster``: Support for dedicated tenancy
+* feature:``cfncluster``: Support for customer provided KMS keys (EBS and ephemeral)
+
+0.0.20
+======
+* feature:``cfncluster``: Support for D2 instances
+* updates:``ami``: Pulled latest CentOS6 errata 
+* updates:``ami``: Pulled latest cfncluster-node package
+* updates:``ami``: Pulled latest ec2-udev-rules package
+* updates:``ami``: Pulled latest NVIDIA driver 346.47
+* updates:``ami``: Removed cfncluster-kernel repo and packages
+* updates:``ami``: Updated Chef client to 12.2.1 + berkshelf
+
+0.0.19
+======
+* feature:``cli``: Added configure command; easy config setup
+* updates:``docs``: Addtional documentation for configuration options
+* updates:``ami``: Pulled latest CentOS6 errata
+* bugfix:``cfncluster``: Fixed issue with nodewatcher not scaling down
+
 0.0.18
 ======
 * updates:``ami``: Custom CentOS 6 kernel repo added, support for >32 vCPUs
